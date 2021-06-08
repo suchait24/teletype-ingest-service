@@ -34,7 +34,7 @@ public class SubscriptionProcessingService {
     private final TeletypeMessageStore teletypeMessageStore;
     private final BatchStore batchStore;
 
-    private final TeletypePublisher teletypePublisher;
+    //private final TeletypePublisher teletypePublisher;
 
     public void processMessages(List<ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO>> msgs, Timestamp batchReceivedTime) throws InterruptedException, ExecutionException, IOException, JAXBException {
 
@@ -46,8 +46,9 @@ public class SubscriptionProcessingService {
             //send acknowledge for all processed messages
             msgs.forEach(msg -> msg.ack());
 
+            //NOTE - This version of code only pushes to database not to topic.
             //send all processed messages to another topic.
-            teletypePublisher.processPublish(teleTypeEntityList);
+            //teletypePublisher.processPublish(teleTypeEntityList);
         }
     }
 
@@ -69,7 +70,6 @@ public class SubscriptionProcessingService {
         teletypeMessageStore.saveMessagesList(teleTypeEntityList);
 
         log.info("Processing stopped, all records processed  : {}", teletypeEventDTOList.size());
-
 
         log.info("Logging batch to database now.");
         BatchEventEntity batchEventEntity = BatchEventEntityUtil.createBatchEventEntity(teleTypeEntityList, batchRecord, SUBSCRIBER_ID);
