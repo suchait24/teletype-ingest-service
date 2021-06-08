@@ -34,8 +34,6 @@ public class SubscriptionProcessingService {
     private final TeletypeMessageStore teletypeMessageStore;
     private final BatchStore batchStore;
 
-    //private final TeletypePublisher teletypePublisher;
-
     public void processMessages(List<ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO>> msgs, Timestamp batchReceivedTime) throws InterruptedException, ExecutionException, IOException, JAXBException {
 
         if (!msgs.isEmpty()) {
@@ -46,9 +44,6 @@ public class SubscriptionProcessingService {
             //send acknowledge for all processed messages
             msgs.forEach(msg -> msg.ack());
 
-            //NOTE - This version of code only pushes to database not to topic.
-            //send all processed messages to another topic.
-            //teletypePublisher.processPublish(teleTypeEntityList);
         }
     }
 
