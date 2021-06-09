@@ -22,7 +22,7 @@ public class TeletypeDataDTOUtil {
         marshaller.marshal(teletypeEventDTO, stringWriter);
 
         String result = stringWriter.toString();
-        log.info("Teletype XML generated : {}", result);
+        //log.info("Teletype XML generated : {}", result);
 
         return result;
     }

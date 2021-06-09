@@ -23,7 +23,7 @@ public class TeleTypeUtil {
 
         TeletypeEventDTO teletypeEventDTO = (TeletypeEventDTO) unmarshaller.unmarshal(new StringReader(message));
 
-        log.info("Teletype dto generated : {}", teletypeEventDTO);
+        //log.info("Teletype dto generated : {}", teletypeEventDTO);
 
         return teletypeEventDTO;
     }
@@ -37,7 +37,7 @@ public class TeleTypeUtil {
         marshaller.marshal(teletypeEventDTO, stringWriter);
 
         String result = stringWriter.toString();
-        log.info("Teletype XML generated : {}", result);
+        //log.info("Teletype XML generated : {}", result);
 
         return result;
     }
