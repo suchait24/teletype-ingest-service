@@ -37,18 +37,6 @@ public class PullSubscriptionService {
         //acknowledge only when batch is successfully processed.
         subscriptionProcessingService.processMessages(msgs, batchReceivedTime);
 
-        /*
-        msgs.forEach(msg -> {
-            log.info("message received : {}", msg.getPayload().toString());
-            msg.ack();
-        });
-
-        if (!msgs.isEmpty()) {
-            List<TeletypeEventDTO> teletypeEventDTOList = msgs.stream().map(msg -> msg.getPayload()).collect(Collectors.toList());
-            BatchRecord batchRecord = BatchRecordUtil.createBatchRecord(teletypeEventDTOList, batchReceivedTime);
-            subscriptionProcessingService.processSubscriptionMessagesList(batchRecord);
-        }
-         */
     }
 
 }

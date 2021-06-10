@@ -66,17 +66,6 @@ public class SubscriptionProcessingService {
                 .map(record -> wrapTeletypeConversionException(record, sequenceNumber.getAndSet(sequenceNumber.get() + 1), batchRecord.getBatchMessageId()))
                 .collect(Collectors.toList());
 
-        /*
-        log.info("processors available : {}", Runtime.getRuntime().availableProcessors());
-
-        List<CompletableFuture<TeleTypeEntity>> teleTypeEntityFutureList = teletypeEventDTOList.stream()
-                .map(record -> CompletableFuture.supplyAsync(() -> wrapTeletypeConversionException(record, sequencerNumber.getAndSet(sequencerNumber.get() + 1), batchRecord.getBatchMessageId()), executorService))
-                .collect(Collectors.toList());
-
-        List<TeleTypeEntity> teleTypeEntityList = teleTypeEntityFutureList.stream().map(CompletableFuture::join).collect(Collectors.toList());
-
-         */
-
         teletypeMessageStore.saveMessagesList(teleTypeEntityList);
 
         log.info("Processing stopped, all records processed  : {}", teletypeEventDTOList.size());
