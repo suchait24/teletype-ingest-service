@@ -1,6 +1,7 @@
 package com.infogain.gcp.poc.consumer.dto;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -9,17 +10,27 @@ import javax.xml.bind.annotation.*;
 @Getter
 @Setter
 @ToString
-@XmlRootElement(name = "TeletypEvent")
+@RequiredArgsConstructor
+@XmlRootElement(name = "Teletype")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder={"messageCorelationId", "carrierCode", "hostRecordLocator"})
+@XmlType(propOrder={"hostLocator", "messageCorrelationId","carrierCode","createdTimestamp","sequenceNumber","batchId"})
 public class TeletypeEventDTO {
 
-    @XmlElement(name = "messageCorelationId")
-    private Long messageCorelationId;
+    @XmlElement(name = "host_locator")
+    private String hostLocator;
 
-    @XmlElement(name = "carrierCode")
+    @XmlElement(name = "message_correlation_id")
+    private String messageCorrelationId;
+
+    @XmlElement(name = "carrier_code")
     private String carrierCode;
 
-    @XmlElement(name = "hostRecordLocator")
-    private String hostRecordLocator;
+    @XmlElement(name = "created")
+    private String createdTimestamp;
+
+    @XmlElement(name = "sequencer_number")
+    private Integer sequenceNumber;
+
+    @XmlElement(name = "batch_id")
+    private Integer batchId;
 }

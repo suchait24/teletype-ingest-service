@@ -1,6 +1,7 @@
 package com.infogain.gcp.poc.consumer.util;
 
 import com.google.cloud.Timestamp;
+import com.google.gson.Gson;
 import com.infogain.gcp.poc.consumer.dto.TeletypeEventDTO;
 import com.infogain.gcp.poc.consumer.entity.TeleTypeEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -37,22 +38,27 @@ public class TeleTypeUtil {
         marshaller.marshal(teletypeEventDTO, stringWriter);
 
         String result = stringWriter.toString();
-        //log.info("Teletype XML generated : {}", result);
+        log.info("Teletype XML generated : {}", result);
 
         return result;
     }
 
-    public static TeleTypeEntity convert(TeletypeEventDTO teletypeEventDTO, String message, Integer sequenceNumber, Integer batchId) {
+    public static String toJsonString(TeletypeEventDTO teletypeEventDTO) {
+        return new Gson().toJson(teletypeEventDTO);
+    }
+
+    public static TeleTypeEntity convert(TeletypeEventDTO teletypeEventDTO, String message, String messageJson) {
 
         return TeleTypeEntity.builder()
                 .tasId(UUID.randomUUID().toString())
-                .hostLocator(teletypeEventDTO.getHostRecordLocator())
+                .hostLocator(teletypeEventDTO.getHostLocator())
                 .carrierCode(teletypeEventDTO.getCarrierCode())
-                .messageCorrelationId(String.valueOf(teletypeEventDTO.getMessageCorelationId()))
-                .sequenceNumber(Long.valueOf(sequenceNumber))
+                .messageCorrelationId(String.valueOf(teletypeEventDTO.getMessageCorrelationId()))
+                .sequenceNumber(Long.valueOf(teletypeEventDTO.getSequenceNumber()))
                 .createdTimestamp(Timestamp.now())
-                .batchId(batchId)
+                .batchId(teletypeEventDTO.getBatchId())
                 .payload(message)
+                .payloadJson(messageJson)
                 .build();
     }
 }

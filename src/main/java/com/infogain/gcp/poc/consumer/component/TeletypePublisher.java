@@ -1,5 +1,5 @@
 package com.infogain.gcp.poc.consumer.component;
-
+/*
 
 import com.infogain.gcp.poc.consumer.entity.TeleTypeEntity;
 import com.infogain.gcp.poc.consumer.util.TeletypeDataDTOUtil;
@@ -30,3 +30,4 @@ public class TeletypePublisher {
         log.info("Messages have been successfully published.");
     }
 }
+*/

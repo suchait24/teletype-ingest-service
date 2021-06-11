@@ -1,4 +1,4 @@
-server.port: 8090
+server.port: 8092
 
 spring:
   profiles.active: dev
@@ -39,9 +39,7 @@ info:
 
 app:
   subscription:
-    id: subs-demo-1
-  topic:
-    name: projects/sab-ors-poc-sbx-01-9096/topics/teletype-topic
+    id: teletype-poc-topic-sub
 
 ---
 spring.profiles: dev

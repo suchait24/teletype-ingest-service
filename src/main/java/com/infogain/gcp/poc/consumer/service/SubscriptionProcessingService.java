@@ -42,7 +42,7 @@ public class SubscriptionProcessingService {
         if (!msgs.isEmpty()) {
             List<TeletypeEventDTO> teletypeEventDTOList = msgs.stream().map(msg -> msg.getPayload()).collect(Collectors.toList());
             BatchRecord batchRecord = BatchRecordUtil.createBatchRecord(teletypeEventDTOList, batchReceivedTime);
-            List<TeleTypeEntity> teleTypeEntityList = processSubscriptionMessagesList(batchRecord);
+            processSubscriptionMessagesList(batchRecord);
 
             //send acknowledge for all processed messages
             msgs.forEach(msg -> msg.ack());
@@ -50,7 +50,7 @@ public class SubscriptionProcessingService {
         }
     }
 
-    private List<TeleTypeEntity> processSubscriptionMessagesList(BatchRecord batchRecord) {
+    private void processSubscriptionMessagesList(BatchRecord batchRecord) {
 
         AtomicReference<Integer> sequenceNumber = new AtomicReference<>(1);
         Instant start = Instant.now();
@@ -63,7 +63,7 @@ public class SubscriptionProcessingService {
         log.info("Started processing subscription messages list , total records found : {}", teletypeEventDTOList.size());
 
         List<TeleTypeEntity> teleTypeEntityList = teletypeEventDTOList.stream()
-                .map(record -> wrapTeletypeConversionException(record, sequenceNumber.getAndSet(sequenceNumber.get() + 1), batchRecord.getBatchMessageId()))
+                .map(record -> wrapTeletypeConversionException(record))
                 .collect(Collectors.toList());
 
         teletypeMessageStore.saveMessagesList(teleTypeEntityList);
@@ -78,14 +78,12 @@ public class SubscriptionProcessingService {
 
         Instant end = Instant.now();
         log.info("total time taken to process {} records is {} ms", teletypeEventDTOList.size(), Duration.between(start, end).toMillis());
-
-        return teleTypeEntityList;
     }
 
-    private TeleTypeEntity wrapTeletypeConversionException(TeletypeEventDTO teletypeEventDTO, Integer sequenceNumber, Integer batchId) {
+    private TeleTypeEntity wrapTeletypeConversionException(TeletypeEventDTO teletypeEventDTO) {
 
         try {
-            return TeleTypeUtil.convert(teletypeEventDTO, TeleTypeUtil.marshall(teletypeEventDTO), sequenceNumber, batchId);
+            return TeleTypeUtil.convert(teletypeEventDTO, TeleTypeUtil.marshall(teletypeEventDTO), TeleTypeUtil.toJsonString(teletypeEventDTO));
         } catch (JAXBException e) {
             log.error("error occurred while converting : {}", e.getMessage());
         }

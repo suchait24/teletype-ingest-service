@@ -17,7 +17,6 @@ public class BatchRecordUtil {
 
         BatchRecord batchRecord = new BatchRecord();
         batchRecord.setDtoList(teletypeEventDTOList);
-        //batchRecord.setBatchMessageId(random.nextInt(7));
         batchRecord.setBatchMessageId(BATCH_MESSAGE_ID++);
         batchRecord.setBatchReceivedTime(batchReceivedTime);
 

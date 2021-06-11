@@ -43,4 +43,7 @@ public class TeleTypeEntity {
 
     @Column(name = "BATCH_ID")
     private Integer batchId;
+
+    @Column(name = "PAYLOAD_JSON")
+    private String payloadJson;
 }

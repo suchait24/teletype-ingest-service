@@ -1,5 +1,6 @@
-package com.infogain.gcp.poc.consumer.util;
 
+package com.infogain.gcp.poc.consumer.util;
+/*
 import com.infogain.gcp.poc.consumer.dto.TeletypeDataDTO;
 import com.infogain.gcp.poc.consumer.dto.TeletypeEventDTO;
 import com.infogain.gcp.poc.consumer.entity.TeleTypeEntity;
@@ -44,3 +45,4 @@ public class TeletypeDataDTOUtil {
 
     }
 }
+*/

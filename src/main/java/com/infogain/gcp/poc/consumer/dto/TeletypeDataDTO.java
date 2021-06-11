@@ -1,6 +1,5 @@
 package com.infogain.gcp.poc.consumer.dto;
-
-import com.google.cloud.Timestamp;
+/*
 import lombok.*;
 
 import javax.xml.bind.annotation.*;
@@ -11,11 +10,8 @@ import javax.xml.bind.annotation.*;
 @RequiredArgsConstructor
 @XmlRootElement(name = "Teletype")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder={"tasId", "hostLocator", "messageCorrelationId","carrierCode","createdTimestamp","updatedTimestamp","sequenceNumber","payload","batchId"})
+@XmlType(propOrder={"hostLocator", "messageCorrelationId","carrierCode","createdTimestamp","sequenceNumber","batchId"})
 public class TeletypeDataDTO {
-
-    @XmlElement(name = "tas_id")
-    private String tasId;
 
     @XmlElement(name = "host_locator")
     private String hostLocator;
@@ -29,15 +25,10 @@ public class TeletypeDataDTO {
     @XmlElement(name = "created")
     private String createdTimestamp;
 
-    @XmlElement(name = "updated")
-    private String updatedTimestamp;
-
     @XmlElement(name = "sequencer_number")
-    private Long sequenceNumber;
-
-    @XmlElement(name = "payload")
-    private String payload;
+    private Integer sequenceNumber;
 
     @XmlElement(name = "batch_id")
     private Integer batchId;
 }
+*/

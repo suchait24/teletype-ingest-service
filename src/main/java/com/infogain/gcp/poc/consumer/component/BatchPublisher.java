@@ -1,5 +1,5 @@
 package com.infogain.gcp.poc.consumer.component;
-
+/*
 import com.google.api.core.ApiFuture;
 import com.google.api.core.ApiFutures;
 import com.google.api.gax.batching.BatchingSettings;
@@ -70,3 +70,4 @@ public class BatchPublisher {
     }
 
 }
+*/
