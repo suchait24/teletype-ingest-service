@@ -1,13 +1,10 @@
 package com.infogain.gcp.poc.consumer.service;
 
 import com.google.cloud.Timestamp;
-import com.infogain.gcp.poc.consumer.component.BatchStore;
 import com.infogain.gcp.poc.consumer.component.TeletypeMessageStore;
 import com.infogain.gcp.poc.consumer.dto.BatchRecord;
 import com.infogain.gcp.poc.consumer.dto.TeletypeEventDTO;
-import com.infogain.gcp.poc.consumer.entity.BatchEventEntity;
 import com.infogain.gcp.poc.consumer.entity.TeleTypeEntity;
-import com.infogain.gcp.poc.consumer.util.BatchEventEntityUtil;
 import com.infogain.gcp.poc.consumer.util.BatchRecordUtil;
 import com.infogain.gcp.poc.consumer.util.TeleTypeUtil;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +28,6 @@ import java.util.stream.Collectors;
 @Service
 public class SubscriptionProcessingService {
 
-    private static final String SUBSCRIBER_ID = "S1";
     private final TeletypeMessageStore teletypeMessageStore;
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
