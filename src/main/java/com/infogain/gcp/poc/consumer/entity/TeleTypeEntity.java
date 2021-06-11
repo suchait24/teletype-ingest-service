@@ -7,6 +7,9 @@ import org.springframework.cloud.gcp.data.spanner.core.mapping.PrimaryKey;
 import org.springframework.cloud.gcp.data.spanner.core.mapping.Table;
 import org.springframework.data.annotation.Id;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,10 +33,10 @@ public class TeleTypeEntity {
     private String carrierCode;
 
     @Column(name = "CREATED_TIMESTAMP")
-    private Timestamp createdTimestamp;
+    private LocalDateTime createdTimestamp;
 
     @Column(name = "UPDATED_TIMESTAMP")
-    private Timestamp updatedTimestamp;
+    private LocalDateTime updatedTimestamp;
 
     @Column(name = "SEQUENCE_NUMBER")
     private Long sequenceNumber;

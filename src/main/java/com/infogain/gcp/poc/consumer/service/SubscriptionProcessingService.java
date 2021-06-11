@@ -33,20 +33,17 @@ public class SubscriptionProcessingService {
 
     private static final String SUBSCRIBER_ID = "S1";
     private final TeletypeMessageStore teletypeMessageStore;
-    private final BatchStore batchStore;
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public void processMessages(List<ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO>> msgs, Timestamp batchReceivedTime) throws InterruptedException, ExecutionException, IOException, JAXBException {
 
         if (!msgs.isEmpty()) {
-            List<TeletypeEventDTO> teletypeEventDTOList = msgs.stream().map(msg -> msg.getPayload()).collect(Collectors.toList());
-            BatchRecord batchRecord = BatchRecordUtil.createBatchRecord(teletypeEventDTOList, batchReceivedTime);
+            BatchRecord batchRecord = BatchRecordUtil.createBatchRecord(msgs, batchReceivedTime);
             processSubscriptionMessagesList(batchRecord);
 
             //send acknowledge for all processed messages
             msgs.forEach(msg -> msg.ack());
-
         }
     }
 
@@ -55,35 +52,29 @@ public class SubscriptionProcessingService {
         AtomicReference<Integer> sequenceNumber = new AtomicReference<>(1);
         Instant start = Instant.now();
 
-        List<TeletypeEventDTO> teletypeEventDTOList = null;
+        List<ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO>> messageList = null;
 
-        if (!batchRecord.getDtoList().isEmpty())
-            teletypeEventDTOList = batchRecord.getDtoList();
+        if (!batchRecord.getMessageList().isEmpty())
+            messageList = batchRecord.getMessageList();
 
-        log.info("Started processing subscription messages list , total records found : {}", teletypeEventDTOList.size());
+        log.info("Started processing subscription messages list , total records found : {}", messageList.size());
 
-        List<TeleTypeEntity> teleTypeEntityList = teletypeEventDTOList.stream()
-                .map(record -> wrapTeletypeConversionException(record))
+        List<TeleTypeEntity> teleTypeEntityList = messageList.stream()
+                .map(message -> wrapTeletypeConversionException(message))
                 .collect(Collectors.toList());
 
         teletypeMessageStore.saveMessagesList(teleTypeEntityList);
 
-        log.info("Processing stopped, all records processed  : {}", teletypeEventDTOList.size());
-
-        log.info("Logging batch to database now.");
-        BatchEventEntity batchEventEntity = BatchEventEntityUtil.createBatchEventEntity(teleTypeEntityList, batchRecord, SUBSCRIBER_ID);
-        log.info("Batch entity generated : {}", batchEventEntity);
-
-        batchStore.saveBatchEventEntity(batchEventEntity);
+        log.info("Processing stopped, all records processed  : {}", teleTypeEntityList.size());
 
         Instant end = Instant.now();
-        log.info("total time taken to process {} records is {} ms", teletypeEventDTOList.size(), Duration.between(start, end).toMillis());
+        log.info("total time taken to process {} records is {} ms", teleTypeEntityList.size(), Duration.between(start, end).toMillis());
     }
 
-    private TeleTypeEntity wrapTeletypeConversionException(TeletypeEventDTO teletypeEventDTO) {
+    private TeleTypeEntity wrapTeletypeConversionException(ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO> message) {
 
         try {
-            return TeleTypeUtil.convert(teletypeEventDTO, TeleTypeUtil.marshall(teletypeEventDTO), TeleTypeUtil.toJsonString(teletypeEventDTO));
+            return TeleTypeUtil.convert(message, TeleTypeUtil.marshall(message.getPayload()), TeleTypeUtil.toJsonString(message.getPayload()));
         } catch (JAXBException e) {
             log.error("error occurred while converting : {}", e.getMessage());
         }
