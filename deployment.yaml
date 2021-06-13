@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: consumer-service-deployment
+  name: teletype-ingest-service-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: consumer-service-pod
+      app: teletype-ingest-service-pod
   template:
     metadata:
       labels:
-        app: consumer-service-pod
+        app: teletype-ingest-service-pod
     spec:
       containers:
-        - image: gcr.io/sab-ors-poc-sbx-01-9096/consumer-service:latest
-          name: consumer-service
+        - image: gcr.io/sab-ors-poc-sbx-01-9096/teletype-ingest-service:latest
+          name: teletype-ingest-service
             

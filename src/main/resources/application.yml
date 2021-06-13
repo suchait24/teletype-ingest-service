@@ -22,7 +22,7 @@ logging:
   pattern.console: '%d{yyyy-MM-dd HH:mm:ss} [%X{source}] [%X{correlation-id}] [%-5level] [%t] [%C:%L] - %m%n'
   level.org.springframework: info
   file:
-    name: logs/consumer-service/consumer-service.log
+    name: logs/teletype-ingest-service/teletype-ingest-service.log
 
 # actuator properties
 management:

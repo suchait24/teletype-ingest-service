@@ -10,10 +10,10 @@ VOLUME /tmp
 EXPOSE 8090
 
 # application jar file when packaged
-ARG jar_file=target/consumer-service.jar
+ARG jar_file=target/teletype-ingest-service.jar
 
 # add application jar file to container
-COPY ${jar_file} consumer-service.jar
+COPY ${jar_file} teletype-ingest-service.jar
 
 # run the jar file
 ENTRYPOINT ["java", "-jar", "consumer-service.jar"]
