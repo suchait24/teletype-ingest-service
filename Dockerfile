@@ -7,7 +7,7 @@ LABEL maintainer="suchait.gaurav.ctr@sabre.com"
 VOLUME /tmp
 
 # Make port 8090 available to the world outside the container
-EXPOSE 8090
+EXPOSE 8092
 
 # application jar file when packaged
 ARG jar_file=target/teletype-ingest-service.jar
