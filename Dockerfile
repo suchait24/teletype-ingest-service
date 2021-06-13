@@ -16,4 +16,4 @@ ARG jar_file=target/teletype-ingest-service.jar
 COPY ${jar_file} teletype-ingest-service.jar
 
 # run the jar file
-ENTRYPOINT ["java", "-jar", "consumer-service.jar"]
+ENTRYPOINT ["java", "-jar", "teletype-ingest-service.jar"]
