@@ -52,7 +52,7 @@ public class TeleTypeUtil {
         return new Gson().toJson(teletypeEventDTO);
     }
 
-    public static TeleTypeEntity convert(ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO> message, String messageXml, String messageJson) {
+    public static TeleTypeEntity convert(ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO> message, String messageXml, String messageJson, String uniqueId) {
 
         /*
         String createdTime = message.getPubsubMessage().getAttributesOrDefault(CREATED_TIME, "default-value");
@@ -65,7 +65,7 @@ public class TeleTypeUtil {
         log.info("message : {}", message);
 
         return TeleTypeEntity.builder()
-                .tasId(UUID.randomUUID().toString())
+                .tasId(uniqueId)
                 .hostLocator(message.getPayload().getHostRecordLocator())
                 .carrierCode(message.getPayload().getCarrierCode())
                 .messageCorrelationId(String.valueOf(message.getPayload().getMessageCorelationId()))

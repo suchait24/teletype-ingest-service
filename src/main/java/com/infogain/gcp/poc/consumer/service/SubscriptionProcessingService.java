@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 public class SubscriptionProcessingService {
 
     private final TeletypeMessageStore teletypeMessageStore;
+    private final DuplicateCheckService duplicateCheckService;
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -55,8 +56,10 @@ public class SubscriptionProcessingService {
 
         log.info("Started processing subscription messages list , total records found : {}", messageList.size());
 
+        String uniqueId = duplicateCheckService.getTasUniqueId();
+
         List<TeleTypeEntity> teleTypeEntityList = messageList.stream()
-                .map(message -> wrapTeletypeConversionException(message))
+                .map(message -> wrapTeletypeConversionException(message,uniqueId))
                 .collect(Collectors.toList());
 
         teletypeMessageStore.saveMessagesList(teleTypeEntityList);
@@ -67,10 +70,10 @@ public class SubscriptionProcessingService {
         log.info("total time taken to process {} records is {} ms", teleTypeEntityList.size(), Duration.between(start, end).toMillis());
     }
 
-    private TeleTypeEntity wrapTeletypeConversionException(ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO> message) {
+    private TeleTypeEntity wrapTeletypeConversionException(ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO> message, String uniqueId) {
 
         try {
-            return TeleTypeUtil.convert(message, TeleTypeUtil.marshall(message.getPayload()), TeleTypeUtil.toJsonString(message.getPayload()));
+            return TeleTypeUtil.convert(message, TeleTypeUtil.marshall(message.getPayload()), TeleTypeUtil.toJsonString(message.getPayload()), uniqueId);
         } catch (JAXBException e) {
             log.error("error occurred while converting : {}", e.getMessage());
         }
