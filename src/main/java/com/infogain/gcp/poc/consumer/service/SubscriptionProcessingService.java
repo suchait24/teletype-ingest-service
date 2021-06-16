@@ -1,6 +1,7 @@
 package com.infogain.gcp.poc.consumer.service;
 
 import com.google.cloud.Timestamp;
+import com.infogain.gcp.poc.consumer.component.BatchList;
 import com.infogain.gcp.poc.consumer.component.TeletypeMessageStore;
 import com.infogain.gcp.poc.consumer.dto.BatchRecord;
 import com.infogain.gcp.poc.consumer.dto.TeletypeEventDTO;
@@ -30,6 +31,7 @@ public class SubscriptionProcessingService {
 
     private final TeletypeMessageStore teletypeMessageStore;
     private final DuplicateCheckService duplicateCheckService;
+    BatchList batchList = new BatchList();
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -56,10 +58,8 @@ public class SubscriptionProcessingService {
 
         log.info("Started processing subscription messages list , total records found : {}", messageList.size());
 
-        String uniqueId = duplicateCheckService.getTasUniqueId();
-
         List<TeleTypeEntity> teleTypeEntityList = messageList.stream()
-                .map(message -> wrapTeletypeConversionException(message,uniqueId))
+                .map(message -> wrapTeletypeConversionException(message))
                 .collect(Collectors.toList());
 
         teletypeMessageStore.saveMessagesList(teleTypeEntityList);
@@ -67,10 +67,17 @@ public class SubscriptionProcessingService {
         log.info("Processing stopped, all records processed  : {}", teleTypeEntityList.size());
 
         Instant end = Instant.now();
-        log.info("total time taken to process {} records is {} ms", teleTypeEntityList.size(), Duration.between(start, end).toMillis());
+        Long totalTime = Duration.between(start, end).toMillis();
+        log.info("total time taken to process {} records is {} ms", teleTypeEntityList.size(), totalTime);
+
+        batchList.setTime(totalTime);
+        Long batchSumTime = batchList.getAllBatchTimeInMillis().stream().reduce(0L, Long::sum);
+        log.info("total time taken for all batches : {} ", Duration.ofMillis(batchSumTime).toMillis());
     }
 
-    private TeleTypeEntity wrapTeletypeConversionException(ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO> message, String uniqueId) {
+    private TeleTypeEntity wrapTeletypeConversionException(ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO> message) {
+
+        String uniqueId = duplicateCheckService.getTasUniqueId();
 
         try {
             return TeleTypeUtil.convert(message, TeleTypeUtil.marshall(message.getPayload()), TeleTypeUtil.toJsonString(message.getPayload()), uniqueId);

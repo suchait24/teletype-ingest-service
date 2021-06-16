@@ -29,13 +29,13 @@ public class StartProcessing {
                 try {
                     pullDemo.pullMessage(subSubscriberTemplate);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.error("Error occurred : {}", e.getMessage());
                 } catch (ExecutionException e) {
-                    e.printStackTrace();
+                    log.error("Error occurred : {}", e.getMessage());
                 } catch (JAXBException e) {
-                    e.printStackTrace();
+                    log.error("Error occurred : {}", e.getMessage());
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("Error occurred : {}", e.getMessage());
                 }
             }
        });

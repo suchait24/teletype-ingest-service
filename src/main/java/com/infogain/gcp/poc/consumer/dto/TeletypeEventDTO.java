@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.*;
 public class TeletypeEventDTO {
 
     @XmlElement(name = "messageCorelationId")
-    private Long messageCorelationId;
+    private String messageCorelationId;
 
     @XmlElement(name = "carrierCode")
     private String carrierCode;
