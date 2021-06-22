@@ -12,7 +12,7 @@ public class UniqueIdGeneration {
     public static String getUniqueId() {
 
         String uniqueId = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR,alphabets,UNIQUE_ID_SIZE);
-        log.info("Unique id generated : {}", uniqueId);
+        //log.info("Unique id generated : {}", uniqueId);
         return uniqueId;
     }
 

@@ -1,6 +1,5 @@
 package com.infogain.gcp.poc.consumer.util;
 
-import com.google.cloud.Timestamp;
 import com.google.gson.Gson;
 import com.infogain.gcp.poc.consumer.dto.TeletypeEventDTO;
 import com.infogain.gcp.poc.consumer.entity.TeleTypeEntity;
@@ -14,8 +13,7 @@ import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
+
 
 @Slf4j
 public class TeleTypeUtil {
@@ -43,7 +41,7 @@ public class TeleTypeUtil {
         marshaller.marshal(teletypeEventDTO, stringWriter);
 
         String result = stringWriter.toString();
-        log.info("Teletype XML generated : {}", result);
+        //log.info("Teletype XML generated : {}", result);
 
         return result;
     }
@@ -62,7 +60,7 @@ public class TeleTypeUtil {
 
          */
 
-        log.info("message : {}", message);
+        //log.info("message : {}", message);
 
         return TeleTypeEntity.builder()
                 .tasId(uniqueId)

@@ -39,7 +39,7 @@ info:
 
 app:
   subscription:
-    id: teletype-poc-topic-sub
+    id: teletype-ingest-service-topic-sub
 
 ---
 spring.profiles: dev

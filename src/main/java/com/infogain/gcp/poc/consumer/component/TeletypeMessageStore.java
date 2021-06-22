@@ -20,11 +20,11 @@ public class TeletypeMessageStore {
     private ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public void saveMessagesList(List<TeleTypeEntity> teleTypeEntityList) {
-        log.info("Saving all messages");
+        //log.info("Saving all messages");
 
         teleTypeEntityList.stream().forEach(record -> CompletableFuture.supplyAsync(() -> tasRepository.save(record), THREAD_POOL));
 
-        log.info("All messages saved in database.");
+        //log.info("All messages saved in database.");
 
     }
 }
