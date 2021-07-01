@@ -1,48 +1,37 @@
 package com.infogain.gcp.poc.consumer.controller;
 
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import java.util.Base64;
-import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
-@WebServlet(value = "/pubsub/authenticated-push")
-public class IngestDecodeService extends HttpServlet {
+@RestController
+public class IngestDecodeService {
 
-    private final Gson gson = new Gson();
-    private final JsonParser jsonParser = new JsonParser();
+    @RequestMapping(value = "/", method = RequestMethod.POST)
+    public ResponseEntity receiveMessage(@RequestBody Body body) {
+        // Get PubSub message from request body.
+        Body.Message message = body.getMessage();
+        if (message == null) {
+            String msg = "Bad Request: invalid Pub/Sub message format";
+            log.info("incoming message is : {}", msg);
+            return new ResponseEntity(msg, HttpStatus.BAD_REQUEST);
+        }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String data = message.getData();
+        String target =
+                !StringUtils.isEmpty(data) ? new String(Base64.getDecoder().decode(data)) : "World";
+        String msg = "Hello " + target + "!";
 
-        Message message = getMessage(req);
-        log.info("Message received : {}", message.getData());
-        resp.setStatus(102);
-        super.doPost(req, resp);
-    }
-
-    private Message getMessage(HttpServletRequest request) throws IOException {
-        String requestBody = request.getReader().lines().collect(Collectors.joining("\n"));
-        JsonElement jsonRoot = jsonParser.parse(requestBody);
-        String messageStr = jsonRoot.getAsJsonObject().get("message").toString();
-        Message message = gson.fromJson(messageStr, Message.class);
-        // decode from base64
-        String decoded = decode(message.getData());
-        message.setData(decoded);
-        return message;
-    }
-
-    private String decode(String data) {
-        return new String(Base64.getDecoder().decode(data));
+        log.info("incoming message is : {}", msg);
+        return new ResponseEntity(msg, HttpStatus.OK);
     }
 }
