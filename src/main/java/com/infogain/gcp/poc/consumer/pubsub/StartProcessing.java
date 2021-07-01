@@ -19,7 +19,7 @@ public class StartProcessing {
     private final PubSubSubscriberTemplate subSubscriberTemplate;
     private final PullSubscriptionService pullDemo;
 
-    @PostConstruct
+    //@PostConstruct
     void runPullAlways() {
         log.info("Start pull mechanism in background.");
 
