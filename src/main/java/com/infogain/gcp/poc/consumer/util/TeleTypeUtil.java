@@ -67,9 +67,9 @@ public class TeleTypeUtil {
                 .hostLocator(message.getPayload().getHostRecordLocator())
                 .carrierCode(message.getPayload().getCarrierCode())
                 .messageCorrelationId(String.valueOf(message.getPayload().getMessageCorelationId()))
-                .sequenceNumber(Long.valueOf(message.getPubsubMessage().getAttributesOrDefault(SEQUENCE_NUMBER, "default-value")))
+                .sequenceNumber(Long.valueOf(message.getPubsubMessage().getAttributesOrDefault(SEQUENCE_NUMBER, "2")))
                 .createdTimestamp(LocalDateTime.now())
-                .batchId(Integer.valueOf(message.getPubsubMessage().getAttributesOrDefault(BATCH_ID, "default-value")))
+                .batchId(Integer.valueOf(message.getPubsubMessage().getAttributesOrDefault(BATCH_ID, "10")))
                 .payload(messageXml)
                 .payloadJson(messageJson)
                 .build();
