@@ -10,18 +10,32 @@ import javax.xml.bind.annotation.*;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
-@XmlRootElement(name = "TeletypEvent")
+@XmlRootElement(name = "Message")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(propOrder={"messageCorelationId", "carrierCode", "hostRecordLocator"})
+@XmlType(propOrder = {"Timestamp", "AddressLine", "Origin", "MessageCorrelationID", "MessageIdentity", "StandardMessageIdentifier", "MessageType", "MessageBody"})
 public class TeletypeEventDTO {
 
-    @XmlElement(name = "messageCorelationId")
-    private String messageCorelationId;
+    @XmlElement(name="Timestamp")
+    private  String Timestamp;
 
-    @XmlElement(name = "carrierCode")
-    private String carrierCode;
+    @XmlElement(name="AddressLine")
+    private AddressLine AddressLine;
 
-    @XmlElement(name = "hostRecordLocator")
-    private String hostRecordLocator;
+    @XmlElement(name="Origin")
+    private  String Origin;
+
+    @XmlElement(name="MessageCorrelationID")
+    private  String MessageCorrelationID;
+
+    @XmlElement(name="MessageIdentity")
+    private  String MessageIdentity;
+
+    @XmlElement(name="StandardMessageIdentifier")
+    private  String StandardMessageIdentifier;
+
+    @XmlElement(name="MessageType")
+    private  String MessageType;
+
+    @XmlElement(name="MessageBody")
+    private MessageBody MessageBody;
 }

@@ -39,7 +39,7 @@ info:
 
 app:
   subscription:
-    id: push-demo-subs
+    id: ingest-service-demo-ordering
 
 ---
 spring.profiles: dev

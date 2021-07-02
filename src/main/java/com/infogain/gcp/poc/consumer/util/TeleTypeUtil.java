@@ -21,6 +21,7 @@ public class TeleTypeUtil {
     private static final String BATCH_ID = "batch_id";
     private static final String SEQUENCE_NUMBER = "sequence_number";
     private static final String CREATED_TIME = "created_time";
+    private static Integer sequenceNumber = 0;
 
     public static TeletypeEventDTO unmarshall(String message) throws JAXBException {
 
@@ -52,22 +53,14 @@ public class TeleTypeUtil {
 
     public static TeleTypeEntity convert(ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO> message, String messageXml, String messageJson, String uniqueId) {
 
-        /*
-        String createdTime = message.getPubsubMessage().getAttributesOrDefault(CREATED_TIME, "default-value");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-        LocalDateTime localDateTime = LocalDateTime.parse(createdTime, formatter);
-        log.info("local date time : {}", localDateTime);
-
-         */
-
-        //log.info("message : {}", message);
+        //log.info("Message : {}", message);
 
         return TeleTypeEntity.builder()
                 .tasId(uniqueId)
-                .hostLocator(message.getPayload().getHostRecordLocator())
-                .carrierCode(message.getPayload().getCarrierCode())
-                .messageCorrelationId(String.valueOf(message.getPayload().getMessageCorelationId()))
-                .sequenceNumber(Long.valueOf(message.getPubsubMessage().getAttributesOrDefault(SEQUENCE_NUMBER, "2")))
+                .hostLocator(message.getPayload().getMessageIdentity())
+                .carrierCode(message.getPayload().getOrigin())
+                .messageCorrelationId(String.valueOf(message.getPayload().getMessageCorrelationID()))
+                .sequenceNumber(Long.valueOf(message.getPubsubMessage().getAttributesOrDefault(SEQUENCE_NUMBER, String.valueOf(sequenceNumber++))))
                 .createdTimestamp(LocalDateTime.now())
                 .batchId(Integer.valueOf(message.getPubsubMessage().getAttributesOrDefault(BATCH_ID, "10")))
                 .payload(messageXml)
