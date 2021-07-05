@@ -33,21 +33,20 @@ public class SubscriptionProcessingService {
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-    public void processMessages(List<ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO>> msgs, Timestamp batchReceivedTime) throws InterruptedException, ExecutionException, IOException, JAXBException {
+    public void processMessages(List<ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO>> msgs, Timestamp batchReceivedTime, Instant startTime) throws InterruptedException, ExecutionException, IOException, JAXBException {
 
         if (!msgs.isEmpty()) {
             BatchRecord batchRecord = BatchRecordUtil.createBatchRecord(msgs, batchReceivedTime);
-            processSubscriptionMessagesList(batchRecord);
+            processSubscriptionMessagesList(batchRecord, startTime);
 
             //send acknowledge for all processed messages
             msgs.forEach(msg -> msg.ack());
         }
     }
 
-    private void processSubscriptionMessagesList(BatchRecord batchRecord) {
+    private void processSubscriptionMessagesList(BatchRecord batchRecord, Instant startTime) {
 
         AtomicReference<Integer> sequenceNumber = new AtomicReference<>(1);
-        Instant start = Instant.now();
 
         List<ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO>> messageList = null;
 
@@ -65,7 +64,7 @@ public class SubscriptionProcessingService {
         //log.info("Processing stopped, all records processed  : {}", teleTypeEntityList.size());
 
         Instant end = Instant.now();
-        Long totalTime = Duration.between(start, end).toMillis();
+        Long totalTime = Duration.between(startTime, end).toMillis();
         log.info("total time taken to process {} records is {} ms", teleTypeEntityList.size(), totalTime);
     }
 

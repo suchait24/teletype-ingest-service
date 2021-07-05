@@ -12,8 +12,12 @@ import org.springframework.stereotype.Service;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
@@ -27,15 +31,33 @@ public class PullSubscriptionService {
 
     private final SubscriptionProcessingService subscriptionProcessingService;
 
+    private ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
     public void pullMessage(PubSubSubscriberTemplate subscriberTemplate) throws InterruptedException, ExecutionException, JAXBException, IOException {
 
+        Instant startTime = Instant.now();
         List<ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO>> msgs = subscriberTemplate
                 .pullAndConvert(ProjectSubscriptionName.of(projectId, subscriptionId).toString(), 100, true, TeletypeEventDTO.class);
 
         Timestamp batchReceivedTime = Timestamp.now();
 
         //acknowledge only when batch is successfully processed.
-        subscriptionProcessingService.processMessages(msgs, batchReceivedTime);
+        //subscriptionProcessingService.processMessages(msgs, batchReceivedTime, startTime);
+
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                subscriptionProcessingService.processMessages(msgs, batchReceivedTime, startTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JAXBException e) {
+                e.printStackTrace();
+            }
+        }, threadPool);
 
     }
 
