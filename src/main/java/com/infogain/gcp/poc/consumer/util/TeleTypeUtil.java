@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.infogain.gcp.poc.consumer.dto.TeletypeEventDTO;
 import com.infogain.gcp.poc.consumer.entity.TeleTypeEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.gcp.pubsub.support.converter.ConvertedAcknowledgeablePubsubMessage;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -51,6 +50,7 @@ public class TeleTypeUtil {
         return new Gson().toJson(teletypeEventDTO);
     }
 
+    /*
     public static TeleTypeEntity convert(ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO> message, String messageXml, String messageJson, String uniqueId) {
 
         //log.info("Message : {}", message);
@@ -67,6 +67,8 @@ public class TeleTypeUtil {
                 .payloadJson(messageJson)
                 .build();
     }
+
+     */
 
     public static TeleTypeEntity convert2(TeletypeEventDTO teletypeEventDTO, String messageXml, String messageJson, String uniqueId) {
 

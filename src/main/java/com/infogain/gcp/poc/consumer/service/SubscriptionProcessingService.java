@@ -1,6 +1,5 @@
 package com.infogain.gcp.poc.consumer.service;
 
-import com.google.pubsub.v1.PubsubMessage;
 import com.google.pubsub.v1.ReceivedMessage;
 import com.infogain.gcp.poc.consumer.component.TeletypeMessageStore;
 import com.infogain.gcp.poc.consumer.dto.BatchRecord;
@@ -11,7 +10,6 @@ import com.infogain.gcp.poc.consumer.util.PubSubMessageHelper;
 import com.infogain.gcp.poc.consumer.util.TeleTypeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.gcp.pubsub.support.converter.ConvertedAcknowledgeablePubsubMessage;
 import org.springframework.stereotype.Service;
 
 import javax.xml.bind.JAXBException;

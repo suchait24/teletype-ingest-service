@@ -1,7 +1,7 @@
 package com.infogain.gcp.poc.consumer.controller;
 
 
-
+/*
 import lombok.extern.slf4j.Slf4j;
 import java.util.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -35,3 +35,5 @@ public class IngestDecodeService {
         return new ResponseEntity(msg, HttpStatus.OK);
     }
 }
+
+ */
