@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
-public class PubSubConfig {
+public class PubSubConfig2 {
 
     @Bean
     public PubSubMessageConverter pubSubMessageConverter() {

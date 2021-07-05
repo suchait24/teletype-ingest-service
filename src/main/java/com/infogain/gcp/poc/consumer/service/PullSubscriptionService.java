@@ -1,17 +1,16 @@
 package com.infogain.gcp.poc.consumer.service;
 
-import com.google.cloud.Timestamp;
-import com.google.pubsub.v1.ProjectSubscriptionName;
-import com.infogain.gcp.poc.consumer.dto.TeletypeEventDTO;
+import com.google.pubsub.v1.ReceivedMessage;
+import com.infogain.gcp.poc.consumer.component.PubSubSubscriber;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.gcp.pubsub.core.subscriber.PubSubSubscriberTemplate;
-import org.springframework.cloud.gcp.pubsub.support.converter.ConvertedAcknowledgeablePubsubMessage;
 import org.springframework.stereotype.Service;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -25,18 +24,22 @@ public class PullSubscriptionService {
     @Value("${app.subscription.id}")
     private String subscriptionId;
 
+    private final PubSubSubscriber pubSubSubscriber;
     private final SubscriptionProcessingService subscriptionProcessingService;
 
-    public void pullMessage(PubSubSubscriberTemplate subscriberTemplate) throws InterruptedException, ExecutionException, JAXBException, IOException {
+    public void pullMessages() throws InterruptedException, ExecutionException, JAXBException, IOException {
 
-        List<ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO>> msgs = subscriberTemplate
-                .pullAndConvert(ProjectSubscriptionName.of(projectId, subscriptionId).toString(), 100, true, TeletypeEventDTO.class);
-
-        Timestamp batchReceivedTime = Timestamp.now();
+        Instant startTime = Instant.now();
+        List<ReceivedMessage> receivedMessageList = pubSubSubscriber.getPullResponse();
 
         //acknowledge only when batch is successfully processed.
-        subscriptionProcessingService.processMessages(msgs, batchReceivedTime);
+        if(!receivedMessageList.isEmpty()) {
 
+            log.info("Message list of size : {} has been pulled.", receivedMessageList.size());
+            LocalDateTime batchReceivedTime = LocalDateTime.now();
+            List<String> ackIds = subscriptionProcessingService.processMessages(receivedMessageList, batchReceivedTime,  startTime);
+            pubSubSubscriber.acknowledgeMessageList(ackIds);
+        }
     }
 
 }

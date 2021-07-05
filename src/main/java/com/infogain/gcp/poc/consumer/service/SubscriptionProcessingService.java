@@ -1,11 +1,13 @@
 package com.infogain.gcp.poc.consumer.service;
 
-import com.google.cloud.Timestamp;
+import com.google.pubsub.v1.PubsubMessage;
+import com.google.pubsub.v1.ReceivedMessage;
 import com.infogain.gcp.poc.consumer.component.TeletypeMessageStore;
 import com.infogain.gcp.poc.consumer.dto.BatchRecord;
 import com.infogain.gcp.poc.consumer.dto.TeletypeEventDTO;
 import com.infogain.gcp.poc.consumer.entity.TeleTypeEntity;
 import com.infogain.gcp.poc.consumer.util.BatchRecordUtil;
+import com.infogain.gcp.poc.consumer.util.PubSubMessageHelper;
 import com.infogain.gcp.poc.consumer.util.TeleTypeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -33,52 +36,68 @@ public class SubscriptionProcessingService {
 
     private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-    public void processMessages(List<ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO>> msgs, Timestamp batchReceivedTime) throws InterruptedException, ExecutionException, IOException, JAXBException {
+    public List<String> processMessages(List<ReceivedMessage> receivedMessageList, LocalDateTime batchReceivedTime, Instant startTime) throws InterruptedException, ExecutionException, IOException, JAXBException {
 
-        if (!msgs.isEmpty()) {
-            BatchRecord batchRecord = BatchRecordUtil.createBatchRecord(msgs, batchReceivedTime);
-            processSubscriptionMessagesList(batchRecord);
+        List<TeletypeEventDTO> teletypeEventDTOList = retrieveTeletypeEventDTOList(receivedMessageList);
 
-            //send acknowledge for all processed messages
-            msgs.forEach(msg -> msg.ack());
-        }
+        BatchRecord batchRecord = BatchRecordUtil.createBatchRecord(teletypeEventDTOList, batchReceivedTime);
+
+        //send acknowledge for all processed messages
+       return receivedMessageList.stream()
+                .map(msg -> msg.getAckId())
+                .collect(Collectors.toList());
     }
 
-    private void processSubscriptionMessagesList(BatchRecord batchRecord) {
+    private void processSubscriptionMessagesList(BatchRecord batchRecord, Instant startTime) {
 
         AtomicReference<Integer> sequenceNumber = new AtomicReference<>(1);
-        Instant start = Instant.now();
 
-        List<ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO>> messageList = null;
+        List<TeletypeEventDTO> teletypeEventDTOList = null;
 
-        if (!batchRecord.getMessageList().isEmpty())
-            messageList = batchRecord.getMessageList();
+        if (!batchRecord.getDtoList().isEmpty())
+            teletypeEventDTOList = batchRecord.getDtoList();
 
-        //log.info("Started processing subscription messages list , total records found : {}", messageList.size());
+        List<TeleTypeEntity> teletypeEventDTOMessages = preparePubSubMessageList(teletypeEventDTOList, sequenceNumber, batchRecord);
 
-        List<TeleTypeEntity> teleTypeEntityList = messageList.stream()
-                .map(message -> wrapTeletypeConversionException(message))
-                .collect(Collectors.toList());
-
-        teletypeMessageStore.saveMessagesList(teleTypeEntityList);
+        teletypeMessageStore.saveMessagesList(teletypeEventDTOMessages);
 
         //log.info("Processing stopped, all records processed  : {}", teleTypeEntityList.size());
 
         Instant end = Instant.now();
-        Long totalTime = Duration.between(start, end).toMillis();
-        log.info("total time taken to process {} records is {} ms", teleTypeEntityList.size(), totalTime);
+        Long totalTime = Duration.between(startTime, end).toMillis();
+        log.info("total time taken to process {} records is {} ms", teletypeEventDTOMessages.size(), totalTime);
     }
 
-    private TeleTypeEntity wrapTeletypeConversionException(ConvertedAcknowledgeablePubsubMessage<TeletypeEventDTO> message) {
+    private TeleTypeEntity wrapTeletypeConversionException(TeletypeEventDTO teletypeEventDTO, Integer sequenceNumber, Integer batchId)  {
 
         String uniqueId = duplicateCheckService.getTasUniqueId();
 
         try {
-            return TeleTypeUtil.convert(message, TeleTypeUtil.marshall(message.getPayload()), TeleTypeUtil.toJsonString(message.getPayload()), uniqueId);
+            return PubSubMessageHelper.getPubSubMessage(teletypeEventDTO, sequenceNumber, batchId, uniqueId);
         } catch (JAXBException e) {
-            log.error("error occurred while converting : {}", e.getMessage());
+            log.error("Exception during marshalling : {}", e.getMessage());
         }
         return null;
+    }
+
+    private List<TeletypeEventDTO> retrieveTeletypeEventDTOList(List<ReceivedMessage> receivedMessageList) {
+
+        //TODO - fix this once tested
+        return receivedMessageList.stream().map(msg -> {
+            try {
+                return TeleTypeUtil.unmarshall(msg.getMessage().getData().toStringUtf8());
+            } catch (JAXBException e) {
+                log.error("error occurred : {}", e.getMessage());
+            }
+            return null;
+        }).collect(Collectors.toList());
+    }
+
+    private List<TeleTypeEntity> preparePubSubMessageList(List<TeletypeEventDTO> teletypeEventDTOList, AtomicReference<Integer> sequenceNumber, BatchRecord batchRecord) {
+
+        return teletypeEventDTOList.stream()
+                .map(record -> wrapTeletypeConversionException(record, sequenceNumber.getAndSet(sequenceNumber.get() + 1), batchRecord.getBatchMessageId()))
+                .collect(Collectors.toList());
     }
 
 }

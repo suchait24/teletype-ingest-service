@@ -67,4 +67,21 @@ public class TeleTypeUtil {
                 .payloadJson(messageJson)
                 .build();
     }
+
+    public static TeleTypeEntity convert2(TeletypeEventDTO teletypeEventDTO, String messageXml, String messageJson, String uniqueId) {
+
+        //log.info("Message : {}", message);
+
+        return TeleTypeEntity.builder()
+                .tasId(uniqueId)
+                .hostLocator(teletypeEventDTO.getMessageCorrelationID())
+                .carrierCode(teletypeEventDTO.getOrigin())
+                .messageCorrelationId(String.valueOf(teletypeEventDTO.getMessageCorrelationID()))
+                .sequenceNumber(Long.valueOf(String.valueOf(sequenceNumber++)))
+                .createdTimestamp(LocalDateTime.now())
+                .batchId(Integer.valueOf(10))
+                .payload(messageXml)
+                .payloadJson(messageJson)
+                .build();
+    }
 }

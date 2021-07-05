@@ -40,6 +40,9 @@ info:
 app:
   subscription:
     id: ingest-service-demo-ordering
+    max:
+      pull:
+        count: 100
 
 ---
 spring.profiles: dev
